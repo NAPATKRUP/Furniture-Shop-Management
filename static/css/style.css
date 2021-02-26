@@ -1,0 +1,83 @@
+body {
+  font-family: "Sarabun", sans-serif !important;
+}
+
+.text-orange {
+  color: #ff6601 !important;
+}
+
+.btn-outline-orange {
+  color: #f1f1f1 !important;
+  border-color: #fff !important;
+}
+
+.btn-outline-orange:hover {
+  color: #f1f1f1 !important;
+  background: #ff6601 !important;
+  border-color: #ff6601 !important;
+}
+
+.hr-orange {
+  height: 1px !important;
+  background-color: #ff6601 !important;
+  border: none !important;
+}
+
+.border-orange {
+  /* border: 1px solid #ff9c78 !important; */
+  transition: 0.1s;
+}
+
+.border-orange:hover {
+  border: 1px solid #ff6601 !important;
+}
+
+.square-orange {
+  width: 50% !important;
+  background-color: #ff6601 !important;
+}
+
+.square-gray {
+  width: 50% !important;
+  padding-bottom: 10% !important;
+  background-color: #343a40 !important;
+}
+
+.btn-orange {
+  background-color: #ff6601 !important;
+  color: white !important;
+}
+
+.btn-orange:hover {
+  background-color: #d55805 !important;
+}
+
+.img-login {
+  height: 20vw !important;
+  margin-top: 25% !important;
+}
+
+.text-error {
+  color: #ff0000 !important;
+  font-size: 0.9rem !important;
+}
+
+.bg-orange {
+  width: 100 !important;
+  padding-bottom: 3% !important;
+  background-color: #ff6601 !important;
+}
+
+.menu-button a {
+  color: #000000 !important;
+}
+
+.menu-button a:hover {
+  text-decoration: none !important;
+}
+
+@media print {
+  .d-print-none {
+    display: none !important;
+  }
+}

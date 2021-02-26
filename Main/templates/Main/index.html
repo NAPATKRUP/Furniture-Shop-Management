@@ -1,0 +1,119 @@
+{% extends "base.html" %} {% block content %}
+<h5 class="mt-4"><i class="fas fa-bars"></i> เมนูการใช้งาน</h5>
+<hr class="mt-3 mb-2 hr-orange" />
+<div class="row">
+  {% if acc_type == 'Owner' or acc_type == 'Sale_Officer' %}
+  <div class="col-3 my-3">
+    <a href="{% url 'view_stock' %}" class="text-dark text-decoration-none">
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-cubes"></i></h1>
+          <h5 class="my-3"><i class="fas fa-search"></i> ตรวจสอบสต็อกสินค้า</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Sale_Officer' %}
+  <div class="col-3 my-3">
+    <a href="{% url 'view_history' %}" class="text-dark text-decoration-none">
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-user-friends"></i></h1>
+          <h5 class="my-3">
+            <i class="fas fa-search"></i> ตรวจสอบประวัติลูกค้า
+          </h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Purchasing_Officer' %}
+  <div class="col-3 my-3">
+    <a href="{% url 'view_supplier' %}" class="text-dark text-decoration-none">
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-industry"></i></h1>
+          <h5 class="my-3">
+            <i class="fas fa-search"></i> ตรวจสอบข้อมูลผู้ผลิต
+          </h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Sale_Officer' %}
+  <div class="col-3 my-3">
+    <a href="{% url 'create_order' %}" class="text-dark text-decoration-none">
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-file-invoice"></i></h1>
+          <h5 class="my-3"><i class="fas fa-plus"></i> สร้างออเดอร์ใหม่</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Purchasing_Officer' %}
+  <div class="col-3 my-3">
+    <a href="{% url 'manage_stock' %}" class="text-dark text-decoration-none">
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-cubes"></i></h1>
+          <h5 class="my-3"><i class="fas fa-cog"></i> จัดการสต็อก</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Sale_Officer' %}
+  <div class="col-3 my-3">
+    <a
+      href="{% url 'manage_customer' %}"
+      class="text-dark text-decoration-none"
+    >
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-user-friends"></i></h1>
+          <h5 class="my-3"><i class="fas fa-cog"></i> จัดการข้อมูลลูกค้า</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Purchasing_Officer' %}
+  <div class="col-3 my-3">
+    <a href="{% url 'manage_item' %}" class="text-dark text-decoration-none">
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-file-alt"></i></h1>
+          <h5 class="my-3"><i class="fas fa-cog"></i> จัดการข้อมูลสินค้า</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' or acc_type == 'Purchasing_Officer' %}
+  <div class="col-3 my-3">
+    <a
+      href="{% url 'manage_supplier' %}"
+      class="text-dark text-decoration-none"
+    >
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-industry"></i></h1>
+          <h5 class="my-3"><i class="fas fa-cog"></i> จัดการข้อมูลผู้ผลิต</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %} {% if acc_type == 'Owner' %}
+  <div class="col-3 my-3">
+    <a
+      href="{% url 'manage_employee' %}"
+      class="text-dark text-decoration-none"
+    >
+      <div class="card border-orange text-center py-1">
+        <div class="card-body">
+          <h1 class="icon-menu"><i class="fas fa-users"></i></h1>
+          <h5 class="my-3"><i class="fas fa-cog"></i> จัดการข้อมูลพนักงาน</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}

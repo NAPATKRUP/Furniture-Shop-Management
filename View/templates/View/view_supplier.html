@@ -1,0 +1,270 @@
+{% extends "base.html" %} {% block content %}
+<h5 class="mt-4"><i class="fas fa-industry"></i> ตรวจสอบข้อมูลผู้ผลิต</h5>
+<hr class="mt-3 mb-2 hr-orange" />
+<div class="row my-3">
+  <div class="col-8">
+    <div class="form-inline">
+      <label for="show_item">แสดง</label>
+      <select
+        class="form-control mx-1"
+        id="show_item"
+        onchange="item_display()"
+      >
+        <option value="5" selected>5</option>
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <span>รายการ</span>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <div class="input-group-text">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+      <input
+        id="search_box"
+        type="text"
+        class="form-control"
+        placeholder="ค้นหา"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col" style="width: 12%;">
+          <span>รหัสผู้ผลิต</span>
+          <span class="float-right text-secondary" onclick="sort('id')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 30%;">
+          <span>ชื่อบริษัท</span>
+          <span class="float-right text-secondary" onclick="sort('name')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 40%;">
+          <span>ที่อยู่</span>
+          <span class="float-right text-secondary" onclick="sort('address')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 10%;">
+          <span>เบอร์ติดต่อ</span>
+          <span class="float-right text-secondary" onclick="sort('phone')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 8%;">
+          <span>อีเมล์</span>
+          <span class="float-right text-secondary" onclick="sort('email')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="data_list"></tbody>
+  </table>
+</div>
+
+<div class="row">
+  <div class="col-6">
+    <span id="item_text"></span>
+  </div>
+  <div class="col-6">
+    <div class="form-inline float-right">
+      <button class="btn btn-orange" onclick="previous_page()">
+        < ย้อนกลับ
+      </button>
+      <input
+        type="text"
+        class="form-control text-center mx-2"
+        id="current_page"
+        style="width: 60px;"
+        value="1"
+        readonly
+      />
+      <button class="btn btn-orange" onclick="next_page()">ถัดไป ></button>
+    </div>
+  </div>
+</div>
+<!-- script -->
+<script>
+  let timer;
+  let data;
+
+  let current_page = 1;
+  let total_page;
+  let show_item;
+  let total_item;
+
+  let sort_status = {
+    id: null,
+    status: null,
+  };
+  let last_event;
+
+  window.onload = function () {
+    initialize();
+  };
+
+  function initialize() {
+    show_item = parseInt(document.getElementById("show_item").value);
+    let search_box = document.getElementById("search_box");
+    search_box.addEventListener("keyup", () => {
+      delay_search(search_box.value, 100);
+    });
+
+    axios.get("/api/supplier/").then(function (response) {
+      data = response.data;
+      total_item = data.length;
+
+      let table = document.getElementById("data_list");
+
+      item_list();
+    });
+  }
+
+  function item_list() {
+    show_item = parseInt(document.getElementById("show_item").value);
+    let table = document.getElementById("data_list");
+    table.innerHTML = "";
+
+    let start = show_item * (current_page - 1);
+    let stop = show_item * current_page;
+
+    for (let i = start; i < stop; i++) {
+      if (data[i]) {
+        let supplier = data[i];
+        let head = document.createElement("tr");
+        for (item in supplier) {
+          if (item !== "account_id") {
+            let td = document.createElement("td");
+            td.innerText = supplier[item];
+            head.append(td);
+          }
+        }
+        table.append(head);
+      }
+    }
+
+    item_text();
+  }
+
+  function item_display() {
+    reset_count();
+    item_list();
+  }
+
+  function item_text() {
+    if (total_item >= show_item) {
+      total_page = Math.ceil(total_item / show_item);
+    } else {
+      total_page = 1;
+    }
+
+    display = document.getElementById("item_text");
+    let start = show_item * (current_page - 1) + 1;
+    let stop = show_item * current_page;
+    if (stop > total_item) {
+      stop = total_item;
+    }
+    if (data.length === 0) {
+      start = 0;
+    }
+    display.innerText = `แสดง ${start} ถึง ${stop} จาก ${total_item} รายการ`;
+  }
+
+  function next_page() {
+    if (current_page + 1 <= total_page) {
+      current_page++;
+      document.getElementById("current_page").value = current_page;
+      item_list();
+    }
+  }
+
+  function previous_page() {
+    if (current_page - 1 >= 1) {
+      current_page--;
+      document.getElementById("current_page").value = current_page;
+      item_list();
+    }
+  }
+
+  function sort(event) {
+    let search = document.getElementById("search_box").value;
+    last_event = event;
+
+    if (event !== sort_status.id) {
+      sort_status.id = event;
+      sort_status.status = "asc";
+    } else if (sort_status.status === "asc") {
+      sort_status.status = "desc";
+    } else if (sort_status.status === "desc") {
+      sort_status.status = "asc";
+    }
+
+    axios
+      .get("/api/supplier/", {
+        params: {
+          sort: sort_status.status,
+          data: event,
+          search_data: search,
+        },
+      })
+      .then(function (response) {
+        data = response.data;
+        total_item = data.length;
+
+        let table = document.getElementById("data_list");
+        table.innerHTML = "";
+
+        item_list();
+      });
+  }
+
+  function search(value) {
+    reset_count();
+
+    axios
+      .get("/api/supplier/", {
+        params: {
+          search: value,
+          sort: sort_status.status,
+          data: last_event,
+          search_data: value,
+        },
+      })
+      .then(function (response) {
+        data = response.data;
+        total_item = data.length;
+
+        let table = document.getElementById("data_list");
+        table.innerHTML = "";
+
+        item_list();
+      });
+  }
+
+  function delay_search(value, ms) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      search(value);
+    }, ms);
+  }
+
+  function reset_count() {
+    current_page = 1;
+    document.getElementById("current_page").value = current_page;
+  }
+</script>
+{% endblock content %}

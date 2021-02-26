@@ -1,0 +1,621 @@
+{% extends "base.html" %} {% block content %}
+<div class="mt-4 d-flex">
+  <h5 class="align-self-end">
+    <i class="fas fa-user-friends"></i> สร้างออเดอร์สินค้า
+  </h5>
+</div>
+<hr class="mt-2 mb-3 hr-orange" />
+<div class="row p-4">
+  <div class="col-5">
+    <div class="form-inline">
+      <label for="show_item">รหัสลูกค้า</label>
+      <input
+        id="search_cus"
+        type="text"
+        class="form-control ml-4"
+        placeholder="รหัสลูกค้า"
+      />
+    </div>
+  </div>
+  <div class="col-7 bg-dark text-light p-4 border rounded" id="detail_cus">
+    <p>รหัสลูกค้า:</p>
+    <p>ชื่อลูกค้า:</p>
+    <p>อีเมล:</p>
+    <p>เบอร์โทรศัพท์:</p>
+    <p>ที่อยู่:</p>
+  </div>
+</div>
+
+<h3 class="mt-4">รายการสินค้า</h3>
+<div class="row mx-3 mt-4">
+  <label for="show_item">ค้นหาสินค้า</label>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <div class="input-group-text">
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
+    <input
+      id="search_box"
+      type="text"
+      class="form-control"
+      placeholder="ค้นหา"
+    />
+  </div>
+</div>
+
+<div class="table-responsive mt-4">
+  <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col" style="width: 10%;">
+          <span>รหัสสินค้า</span>
+          <span class="float-right text-secondary" onclick="sort('item_id')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 15%;">
+          <span>ชื่อ</span>
+          <span
+            class="float-right text-secondary"
+            onclick="sort('item_id__name')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 30%;">
+          <span>รายละเอียด</span>
+          <span
+            class="float-right text-secondary"
+            onclick="sort('item_id__description')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 10%;">
+          <span>ประเภท</span>
+          <span
+            class="float-right text-secondary"
+            onclick="sort('item_id__item_type')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 10%;">
+          <span>สี</span>
+          <span class="float-right text-secondary" onclick="sort('color')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 10%;">
+          <span>จำนวน</span>
+          <span class="float-right text-secondary" onclick="sort('amount')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 10%;">
+          <span>ราคา</span>
+          <span
+            class="float-right text-secondary"
+            onclick="sort('item_id__sale_price')"
+            ><i class="fas fa-sort"></i
+          ></span>
+        </th>
+        <th scope="col" style="width: 5%;">
+          <span>เพิ่ม</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="data_list"></tbody>
+  </table>
+</div>
+
+<div class="row">
+  <div class="col-6">
+    <span id="item_text"></span>
+  </div>
+  <div class="col-6">
+    <div class="form-inline float-right">
+      <button class="btn btn-orange" onclick="previous_page()">
+        < ย้อนกลับ
+      </button>
+      <input
+        type="text"
+        class="form-control text-center mx-2"
+        id="current_page"
+        style="width: 60px;"
+        value="1"
+        readonly
+      />
+      <button class="btn btn-orange" onclick="next_page()">ถัดไป ></button>
+    </div>
+  </div>
+</div>
+<br />
+<h3 class="mt-4">รายการที่สั่งซื้อ</h3>
+<div class="table-responsive mt-4">
+  <table class="table table-bordered">
+    <thead class="thead-dark text-center">
+      <tr>
+        <th scope="col" style="width: 10%;">รายการ</th>
+        <th scope="col" style="width: 15%;">ชื่อสินค้า</th>
+        <th scope="col" style="width: 20%;">รายละเอียดสินค้า</th>
+        <th scope="col" style="width: 10%;">สี</th>
+        <th scope="col" style="width: 10%;">จำนวน</th>
+        <th scope="col" style="width: 10%;">ราคาต่อชิ้น</th>
+        <th scope="col" style="width: 10%;">ราคารวม</th>
+        <th scope="col" style="width: 5%;">ลบ</th>
+      </tr>
+    </thead>
+    <tbody id="order_list">
+      <tr id="total_all">
+        <th colspan="6" scope="col" style="width: 10%;" class="pl-4">
+          รวมทั้งหมด
+        </th>
+        <th colspan="2" scope="col" style="width: 5%;" class="pr-4 text-right">
+          0 บาท
+        </th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<form
+  action="{% url 'send_order' %}"
+  class="bg-dark text-light border rounded p-4 m-4"
+  method="POST"
+>
+  {% csrf_token %}
+  <h3 class="mt-4">ยืนยันการสั่งซื้อ</h3>
+  <div class="row mt-4">
+    <div class="col-10">
+      <div class="row">
+        <div class="col-2">
+          <p>
+            รหัสลูกค้า:
+            <input type="text" class="form-control" id="show-cus-id" disabled />
+            <input
+              type="hidden"
+              class="form-control"
+              id="cus-id"
+              name="cus-id"
+            />
+          </p>
+        </div>
+        <div class="col-5">
+          <p>
+            ชื่อลูกค้า:
+            <input
+              type="text"
+              class="form-control"
+              id="show-cus-name"
+              disabled
+            />
+          </p>
+        </div>
+        <div class="col-5">
+          <p>
+            อีเมล:
+            <input
+              type="text"
+              class="form-control"
+              id="show-cus-email"
+              disabled
+            />
+          </p>
+        </div>
+      </div>
+      <p>
+        รายการทั้งหมด:
+        <input type="text" class="form-control" id="show-list-item" disabled />
+        <input
+          type="hidden"
+          class="form-control"
+          id="list-item"
+          name="list-item"
+        />
+      </p>
+
+      <p>
+        จำนวนชิ้นทั้งหมด:
+        <input
+          type="text"
+          class="form-control"
+          id="show-items-value"
+          disabled
+        />
+        <input
+          type="hidden"
+          class="form-control"
+          id="items-value"
+          name="items-value"
+        />
+      </p>
+
+      <p>
+        ราคารวม:
+        <input
+          type="text"
+          class="form-control"
+          id="show-total-price"
+          disabled
+        />
+        <input
+          type="hidden"
+          class="form-control"
+          id="total-price"
+          name="total-price"
+        />
+      </p>
+    </div>
+    <div class="col-2">
+      <input
+        type="submit"
+        class="btn btn-orange p-3 my-4"
+        id="send_order_data"
+        value="สร้างรายการสั่งซื้อ"
+        disabled
+      />
+    </div>
+  </div>
+</form>
+
+<script>
+  let timer;
+  let data;
+
+  let current_page = 1;
+  let total_page;
+  let show_item = 3;
+  let total_item;
+
+  let count = 0;
+  let list_item_select = [];
+
+  let sort_status = {
+    id: null,
+    status: null,
+  };
+  let last_event;
+
+  window.onload = function () {
+    initialize();
+  };
+
+  function initialize() {
+    let search_box = document.getElementById("search_box");
+    search_box.addEventListener("keyup", () => {
+      delay_search(search_box.value, 100);
+    });
+
+    let search_cus = document.getElementById("search_cus");
+    search_cus.addEventListener("keyup", () => {
+      delay_search_cus(search_cus.value, 100);
+    });
+
+    axios.get("/api/stock/").then(function (response) {
+      data = response.data;
+      total_item = data.length;
+
+      let table = document.getElementById("data_list");
+
+      item_list();
+    });
+  }
+
+  function item_list() {
+    let table = document.getElementById("data_list");
+    table.innerHTML = "";
+
+    let start = show_item * (current_page - 1);
+    let stop = show_item * current_page;
+
+    for (let i = start; i < stop; i++) {
+      if (data[i]) {
+        let stock = data[i];
+        let head = document.createElement("tr");
+        let txt = "";
+        txt += `
+          <td>${stock["item_id"].id}</td>
+          <td>${stock["item_id"].name}</td>
+          <td>${stock["item_id"].description}</td>
+          <td>${stock["item_id"].item_type}</td>
+          <td>${stock["color"]}</td>
+          <td>${stock["amount"]}</td>
+          <td>${stock["item_id"].sale_price}</td>
+        `;
+        if (stock["amount"])
+          txt += `<td><button class="btn btn-orange" onclick="get_item(${stock["id"]})">
+                                      <i class="fas fa-plus-square"></i></button></td>`;
+        else
+          txt += `<td><div class="btn btn-secondary">
+                        <i class="fas fa-plus-square"></i></div></td>`;
+        head.innerHTML = txt;
+        table.append(head);
+      }
+    }
+    item_text();
+  }
+
+  function item_display() {
+    reset_count();
+    item_list();
+  }
+
+  function item_text() {
+    if (total_item >= show_item) {
+      total_page = Math.ceil(total_item / show_item);
+    } else {
+      total_page = 1;
+    }
+
+    display = document.getElementById("item_text");
+    let start = show_item * (current_page - 1) + 1;
+    let stop = show_item * current_page;
+    if (stop > total_item) {
+      stop = total_item;
+    }
+    if (data.length === 0) {
+      start = 0;
+    }
+    display.innerText = `แสดง ${start} ถึง ${stop} จาก ${total_item} รายการ`;
+  }
+
+  function next_page() {
+    if (current_page + 1 <= total_page) {
+      current_page++;
+      document.getElementById("current_page").value = current_page;
+      item_list();
+    }
+  }
+
+  function previous_page() {
+    if (current_page - 1 >= 1) {
+      current_page--;
+      document.getElementById("current_page").value = current_page;
+      item_list();
+    }
+  }
+
+  function sort(event) {
+    let search = document.getElementById("search_box").value;
+    last_event = event;
+    if (event !== sort_status.id) {
+      sort_status.id = event;
+      sort_status.status = "asc";
+    } else if (sort_status.status === "asc") {
+      sort_status.status = "desc";
+    } else if (sort_status.status === "desc") {
+      sort_status.status = "asc";
+    }
+
+    axios
+      .get("/api/stock/", {
+        params: {
+          sort: sort_status.status,
+          data: event,
+          search_data: search,
+          del_list: list_item_select.join(),
+        },
+      })
+      .then(function (response) {
+        data = response.data;
+        total_item = data.length;
+
+        let table = document.getElementById("data_list");
+        table.innerHTML = "";
+
+        item_list();
+      });
+  }
+
+  function search(value) {
+    reset_count();
+
+    axios
+      .get("/api/stock/", {
+        params: {
+          search: value,
+          sort: sort_status.status,
+          data: last_event,
+          search_data: document.getElementById("search_box").value,
+          del_list: list_item_select.join(),
+        },
+      })
+      .then(function (response) {
+        data = response.data;
+        total_item = data.length;
+
+        let table = document.getElementById("data_list");
+        table.innerHTML = "";
+
+        item_list();
+      });
+  }
+
+  function delay_search(value, ms) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      search(value);
+    }, ms);
+  }
+
+  function reset_count() {
+    current_page = 1;
+    document.getElementById("current_page").value = current_page;
+  }
+
+  function delay_search_cus(value, ms) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      get_cus(value);
+    }, ms);
+  }
+
+  function get_cus(value) {
+    axios
+      .get("/api/customer/", {
+        params: {
+          get_data: value,
+        },
+      })
+      .then(function (response) {
+        send_cus = response.data;
+        show_cus();
+      });
+  }
+
+  function show_cus() {
+    let detail_cus = document.getElementById("detail_cus");
+    if (send_cus[0]) {
+      let cus_data = send_cus[0];
+      detail_cus.innerHTML = `
+            <p id="cus-id-${cus_data["id"]}">รหัสลูกค้า: ${cus_data["id"]}</p>
+            <p>ชื่อลูกค้า: ${cus_data["fname"]} ${cus_data["lname"]}</p>
+            <p>อีเมล: ${cus_data["email"]}</p>
+            <p>เบอร์โทรศัพท์: ${cus_data["phone"]}</p>
+            <p>ที่อยู่: ${cus_data["address"]}</p>
+            `;
+      document.getElementById("show-cus-id").value = cus_data["id"];
+      document.getElementById("cus-id").value = cus_data["id"];
+      document.getElementById("show-cus-name").value =
+        cus_data["fname"] + " " + cus_data["lname"];
+      document.getElementById("show-cus-email").value = cus_data["email"];
+    }
+  }
+
+  function get_item(id) {
+    axios
+      .get("/api/stock/", {
+        params: {
+          get_data: id,
+        },
+      })
+      .then(function (response) {
+        send_item = response.data;
+        add_item();
+      });
+  }
+
+  function removeTotalAll() {
+    let order_table = document.getElementById("order_list");
+    document.getElementById("total_all").remove();
+    let total_price_order = document.createElement("tr");
+    total_price_order.setAttribute("id", "total_all");
+    let total_price = 0;
+    for (let i = 1; i <= count; i++) {
+      try {
+        let list_price = document.querySelector(`#item-${i} > td:nth-child(7)`)
+          .innerHTML;
+        total_price += parseFloat(list_price);
+      } catch {
+        continue;
+      }
+    }
+    total_price_order.innerHTML = `
+          <th colspan="6" scope="col" style="width: 10%;" class="pl-4">รวมทั้งหมด</th>
+          <th colspan="2" scope="col" style="width: 5%;" class="pr-4 text-right">${total_price.toFixed(
+            2
+          )} บาท</th>
+        `;
+    order_table.append(total_price_order);
+  }
+
+  function add_item() {
+    let order_table = document.getElementById("order_list");
+    if (send_item[0]) {
+      let item_data = send_item[0];
+      let new_item = document.createElement("tr");
+      let now = ++count;
+      let price = item_data["item_id"].sale_price;
+      new_item.setAttribute("id", `item-${now}`);
+      new_item.innerHTML = `
+          <td>${now}</td>
+          <td>${item_data["item_id"].name}</td>
+          <td>${item_data["item_id"].description}</td>
+          <td>${item_data["color"]}</td>
+          <td><input type="number" value='1' min="1" max="${item_data["amount"]}" class="form-control w-100" id="value-item-${now}""></td>
+          <td>${item_data["item_id"].sale_price}</td>
+          <td>${item_data["item_id"].sale_price}</td>
+          <td><button class="btn btn-danger" onclick="delete_item(${item_data["id"]}, ${now})"><i class="fas fa-minus-square"></i></button></td>
+          `;
+      order_table.append(new_item);
+      removeTotalAll();
+
+      //Add Total list price Event
+      add_e = document.getElementById(`value-item-${now}`);
+      add_e.addEventListener("keyup", () => {
+        if (document.getElementById(`value-item-${now}`).value <= 0) {
+          document.getElementById(`value-item-${now}`).value = 1;
+        } else if (
+          document.getElementById(`value-item-${now}`).value >
+          item_data["amount"]
+        ) {
+          document.getElementById(`value-item-${now}`).value =
+            item_data["amount"];
+        }
+        document.querySelector(`#item-${now} > td:nth-child(7)`).innerText = (
+          price * document.getElementById(`value-item-${now}`).value
+        ).toFixed(2);
+        removeTotalAll();
+        update_card();
+      });
+      list_item_select.push(item_data["id"]);
+      update_card();
+      search(document.getElementById("search_box").value);
+      item_list();
+    }
+  }
+
+  function delete_item(id, item) {
+    for (let i = 0; i < list_item_select.length; i++) {
+      if (list_item_select[i] == id) {
+        list_item_select.splice(i, 1);
+        break;
+      }
+    }
+    document.getElementById(`item-${item}`).remove();
+    search(document.getElementById("search_box").value);
+    removeTotalAll();
+    update_card();
+  }
+
+  function update_card() {
+    let total_amount = 0;
+    let all_amount = [];
+    document.getElementById("list-item").value = list_item_select;
+    document.getElementById("show-list-item").value =
+      list_item_select.length + " รายการ";
+    for (let i = 1; i <= count; i++) {
+      try {
+        let list_amount = document.querySelector(`#item-${i} > td:nth-child(7)`)
+          .innerHTML;
+        let list_per_amount = document.querySelector(
+          `#item-${i} > td:nth-child(6)`
+        ).innerHTML;
+        let amount_now = parseInt(list_amount) / parseInt(list_per_amount);
+        total_amount += amount_now;
+        all_amount.push(amount_now);
+      } catch {
+        continue;
+      }
+    }
+    document.getElementById("show-items-value").value = total_amount + " ชิ้น";
+    document.getElementById("items-value").value = all_amount;
+    let total_price_to_show = document.querySelector(
+      "#total_all > th.pr-4.text-right"
+    ).innerText;
+    document.getElementById("show-total-price").value = total_price_to_show;
+    document.getElementById("total-price").value = total_price_to_show.split(
+      " "
+    )[0];
+
+    if (
+      document.getElementById("cus-id").value &&
+      document.getElementById("list-item").value &&
+      document.getElementById("items-value").value &&
+      document.getElementById("total-price").value
+    ) {
+      document.getElementById("send_order_data").disabled = false;
+    }
+  }
+</script>
+
+{% endblock content %}

@@ -1,0 +1,219 @@
+{% extends "base.html" %} {% block content %}
+<h5 class="mt-4"><i class="fas fa-edit"></i> แก้ไขข้อมูลพนักงาน</h5>
+<hr class="my-3 hr-orange" />
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="username">ชื่อผู้ใช้:</label>
+  <input type="text" id="username" class="form-control mt-0 mb-2" readonly />
+  <p class="text-error" id="error_username"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="fname">ชื่อจริง:</label>
+  <input type="text" id="fname" class="form-control mt-0 mb-2" />
+  <p class="text-error" id="error_fname"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="lname">นามสกุล:</label>
+  <input type="text" id="lname" class="form-control mt-0 mb-2" />
+  <p class="text-error" id="error_lname"></p>
+</div>
+
+<div class="text-center">
+  <button
+    onclick=""
+    class="btn btn-success"
+    data-toggle="modal"
+    data-target="#modal1"
+  >
+    บันทึกข้อมูล
+  </button>
+  <button class="btn btn-danger" data-toggle="modal" data-target="#modal2">
+    ลบข้อมูล
+  </button>
+</div>
+
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <hr class="my-3 hr-orange" />
+  <label for="phone">เบอร์:</label>
+  <input type="text" id="phone" class="form-control mt-0 mb-2" maxlength="10" />
+  <p class="text-error" id="error_phone"></p>
+  <div class="text-center">
+    <button class="btn btn-orange" onclick="save2()">
+      บันทึกเบอร์
+    </button>
+  </div>
+</div>
+
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <hr class="my-3 hr-orange" />
+  <label for="phone">ฝ่าย:</label>
+  <div class="radio">
+    <label
+      ><input
+        type="radio"
+        name="department"
+        class="mx-2 my-2"
+        id="radio1"
+        value="PURCHASING_OFFICER"
+      />ฝ่ายจัดซื้อ</label
+    >
+  </div>
+  <div class="radio">
+    <label
+      ><input
+        type="radio"
+        name="department"
+        class="mx-2 my-2"
+        id="radio2"
+        value="SALE_OFFICER"
+      />ฝ่ายจัดขาย</label
+    >
+  </div>
+  <div class="text-center">
+    <button class="btn btn-orange" onclick="save3()">
+      บันทึกฝ่าย
+    </button>
+  </div>
+</div>
+
+<!-- modal1 -->
+<div class="modal fade" id="modal1" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการบันทึกข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button onclick="save()" class="btn btn-success" data-dismiss="modal">
+            บันทึก
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal2 -->
+<div class="modal fade" id="modal2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการลบข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button
+            onclick="delete_data()"
+            class="btn btn-success"
+            data-dismiss="modal"
+          >
+            ลบ
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  window.onload = function () {
+    initialize();
+  };
+
+  let user_id = {{ id }};
+  let employee_id;
+
+  function initialize() {
+    axios.get("/api/user/", {params:{id: user_id}}).then((response) => {
+      document.getElementById('username').value = response.data[0].username
+      document.getElementById('fname').value = response.data[0].first_name
+      document.getElementById('lname').value = response.data[0].last_name
+    });
+    axios.get("/api/account/", {params:{id: user_id}}).then((response) => {
+      document.getElementById('phone').value = response.data[0].phone
+    });
+    axios.get("/api/employee/", {params:{user_id: user_id}}).then((response) => {
+      employee_id = response.data[0].id
+      if (response.data[0].department === 'PURCHASING_OFFICER') {
+        document.getElementById("radio1").setAttribute('checked', true)
+      } else if (response.data[0].department === 'SALE_OFFICER') {
+        document.getElementById("radio2").setAttribute('checked', true)
+      }
+    });
+  }
+
+  function save() {
+    document.getElementById('error_fname').innerText = ""
+    document.getElementById('error_lname').innerText = ""
+
+    axios.put("/api/user/", {
+      id: user_id,
+      first_name: document.getElementById('fname').value,
+      last_name: document.getElementById('lname').value,
+    }).then((response) => {
+      window.location.href = "/manage/employee/";
+    }).catch((error) => {
+      if (error.response.data.first_name){
+        document.getElementById('error_fname').innerText = error.response.data.first_name[0]
+      }
+      if (error.response.data.last_name){
+        document.getElementById('error_lname').innerText = error.response.data.last_name[0]
+      }
+    })
+  }
+
+  function save2() {
+    axios.put("/api/account/", {
+      id: user_id,
+      phone: document.getElementById('phone').value,
+    }).then((response) => {
+      window.location.href = "/manage/employee/";
+    }).catch((error) => {
+      if (error.response.data.phone){
+        document.getElementById('error_phone').innerText = error.response.data.phone[0]
+      }
+    })
+  }
+
+  function save3() {
+    if (document.getElementById('radio1').checked) {
+      department = document.getElementById('radio1').value;
+    } else if (document.getElementById('radio2').checked) {
+      department = document.getElementById('radio2').value;
+    }
+    axios.put("/api/employee/", {
+      id: employee_id,
+      department: department,
+    }).then((response) => {
+      window.location.href = "/manage/employee/";
+    })
+  }
+
+  function delete_data() {
+    axios.delete("/api/employee/", {
+      data: {
+        id: employee_id
+      }
+      }).then((response) => {
+      window.location.href = "/manage/employee/";
+    })
+  }
+</script>
+{% endblock content %}

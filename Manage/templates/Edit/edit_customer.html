@@ -1,0 +1,164 @@
+{% extends "base.html" %} {% block content %}
+<h5 class="mt-4"><i class="fas fa-edit"></i> แก้ไขข้อมูลลูกค้า</h5>
+<hr class="my-3 hr-orange" />
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="fname">ชื่อจริง:</label>
+  <input type="text" id="fname" class="form-control mt-0 mb-2" name="fname" />
+  <p class="text-error" id="error_fname"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+    <label for="fname">นามสกุล:</label>
+    <input type="text" id="lname" class="form-control mt-0 mb-2" name="fname" />
+    <p class="text-error" id="error_lname"></p>
+  </div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="fname">อีเมล:</label>
+  <input type="text" id="email" class="form-control mt-0 mb-2" name="fname" />
+  <p class="text-error" id="error_email"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="fname">เบอร์มือถือ:</label>
+  <input
+    type="text"
+    id="phone"
+    class="form-control mt-0 mb-2"
+    name="fname"
+    maxlength="10"
+  />
+  <p class="text-error" id="error_phone"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="fname">ที่อยู่:</label>
+  <textarea id="address" class="form-control" rows="4"> </textarea>
+  <p class="text-error" id="error_address"></p>
+</div>
+<div class="text-center">
+  <button
+    onclick=""
+    class="btn btn-success"
+    data-toggle="modal"
+    data-target="#modal1"
+  >
+    บันทึกข้อมูล
+  </button>
+  <button class="btn btn-danger" data-toggle="modal" data-target="#modal2">
+    ลบข้อมูล
+  </button>
+</div>
+
+<!-- modal1 -->
+<div class="modal fade" id="modal1" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการบันทึกข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button onclick="save()" class="btn btn-success" data-dismiss="modal">
+            บันทึก
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- modal2 -->
+  <div class="modal fade" id="modal2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header text-center">
+          <h5 calss="ml-2">
+            <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+          </h5>
+        </div>
+        <div class="modal-body text-center">
+          <h5>คุณต้องการลบข้อมูลใช่หรือไม่?</h5>
+        </div>
+        <div>
+          <div class="modal-footer mt-3">
+            <button onclick="delete_data()" class="btn btn-success" data-dismiss="modal">
+              ลบ
+            </button>
+            <button onclick="" class="btn btn-danger" data-dismiss="modal">
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script>
+
+      window.onload = function () {
+        initialize();
+      };
+
+      let customer_id = {{ id }};
+      let user_id = {{ user.id }}
+
+      function initialize() {
+        axios.get("/api/customer/", {params:{id: customer_id}}).then((response) => {
+          document.getElementById('fname').value = response.data[0].fname
+          document.getElementById('lname').value = response.data[0].lname
+          document.getElementById('email').value = response.data[0].email
+          document.getElementById('phone').value = response.data[0].phone
+          document.getElementById('address').value = response.data[0].address
+        });
+      }
+
+      function save() {
+        document.getElementById('error_fname').innerText = ""
+        document.getElementById('error_lname').innerText = ""
+        document.getElementById('error_email').innerText = ""
+        document.getElementById('error_phone').innerText = ""
+        document.getElementById('error_address').innerText = ""
+        
+        axios.put("/api/customer/", {
+          id: customer_id,
+          fname: document.getElementById('fname').value,
+          lname: document.getElementById('lname').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          address: document.getElementById('address').value,
+          account_id: user_id
+        }).then((response) => {
+          window.location.href = "/manage/customer/";
+        }).catch((error) => {
+          if (error.response.data.name){
+            document.getElementById('error_fname').innerText = error.response.data.fname[0]
+          }
+          if (error.response.data.name){
+            document.getElementById('error_lname').innerText = error.response.data.lname[0]
+          }
+          if (error.response.data.email){
+            document.getElementById('error_email').innerText = error.response.data.email[0]
+          }
+          if (error.response.data.phone){
+            document.getElementById('error_phone').innerText = error.response.data.phone[0]
+          }
+          if (error.response.data.address){
+            document.getElementById('error_address').innerText = error.response.data.address[0]
+          }
+        })
+      }
+
+      function delete_data() {
+        axios.delete("/api/customer/", { data: { id: customer_id } }).then((response) => {
+          window.location.href = "/manage/customer/";
+        })
+      }
+    </script>
+    {% endblock content %}
+  </div>
+</div>

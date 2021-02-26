@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Furniture Shop Management</title>
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="{% static 'image/icon.png' %}"
+    />
+    <!-- font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap"
+      rel="stylesheet"
+    />
+    <!-- css -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/all.css' %}" />
+  </head>
+  <body>
+    <!-- navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="\">
+        <i class="fas fa-th"></i>
+        <h5 class="d-inline mx-2">FSM</h5>
+      </a>
+      <div class="navbar-nav ml-auto">
+        {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            id="navbarDropdown"
+            role="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <span class="text-white"
+              ><i class="fas fa-user"></i> : {{ user.get_username }}</span
+            >
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'change_password' %}"
+              ><i class="fas fa-edit text-orange"></i> แก้ไขรหัสผ่าน</a
+            >
+          </div>
+        </li>
+        <p class="text-white my-auto mr-3"></p>
+        <a class="btn btn-outline-orange" href="{% url 'logout' %}"
+          ><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a
+        >
+        {% else %}
+        <a class="btn btn-outline-orange" href="{% url 'login' %}"
+          ><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</a
+        >
+        {% endif %}
+      </div>
+    </nav>
+    <!-- container -->
+    <div class="container mb-3">
+      {% block content %} {% endblock %}
+    </div>
+    <!-- js -->
+    <script src="{% static 'js/axios.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script>
+      axios.defaults.xsrfCookieName = "csrftoken";
+      axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+    </script>
+  </body>
+</html>

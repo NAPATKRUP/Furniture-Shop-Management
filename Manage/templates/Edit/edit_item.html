@@ -1,0 +1,252 @@
+{% extends "base.html" %} {% block content %}
+<h5 class="mt-4"><i class="fas fa-edit"></i> แก้ไขข้อมูลสินค้า</h5>
+<hr class="my-3 hr-orange" />
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="name">ชื่อสินค้า:</label>
+  <input type="text" id="name" class="form-control mt-0 mb-2" />
+  <p class="text-error" id="error_name"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="supplier_name" class="mt-2">ชื่อบริษัท:</label>
+  <div class="form-group text-white">
+    <div class="input-group mb-2 mr-sm-2">
+      <div class="input-group-prepend">
+        <div class="input-group-text">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+      <input
+        id="search_box"
+        type="text"
+        class="form-control w-25"
+        placeholder="ค้นหา"
+      />
+      <select name="" id="dropdown_item" class="form-control ml-3" required>
+      </select>
+    </div>
+  </div>
+  <p class="text-error" id="error_supplier_name"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="color">รายละเอียดสินค้า:</label>
+  <textarea type="text" id="description" class="form-control mt-0 mb-2" /></textarea>
+  <p class="text-error" id="error_description"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="item_type">ประเภทสินค้า:</label>
+  <input type="text" id="item_type" class="form-control mt-0 mb-2" />
+  <p class="text-error" id="error_item_type"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+    <label for="purchase_price">รายคาซื้อ:</label>
+    <input type="text" id="purchase_price" class="form-control mt-0 mb-2" />
+    <p class="text-error" id="error_purchase_price"></p>
+  </div>
+  <div class="form-group text-dark col-8 mx-auto mt-3">
+    <label for="sale_price">ราคาขาย:</label>
+    <input type="text" id="sale_price" class="form-control mt-0 mb-2" />
+    <p class="text-error" id="error_sale_price"></p>
+  </div>
+
+<div class="text-center">
+  <button
+    onclick=""
+    class="btn btn-success"
+    data-toggle="modal"
+    data-target="#modal1"
+  >
+    บันทึกข้อมูล
+  </button>
+  <button class="btn btn-danger" data-toggle="modal" data-target="#modal2">
+    ลบข้อมูล
+  </button>
+</div>
+
+<!-- modal1 -->
+<div class="modal fade" id="modal1" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการบันทึกข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button onclick="save()" class="btn btn-success" data-dismiss="modal">
+            บันทึก
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal2 -->
+<div class="modal fade" id="modal2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการลบข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button
+            onclick="delete_data()"
+            class="btn btn-success"
+            data-dismiss="modal"
+          >
+            ลบ
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    window.onload = function () {
+      initialize();
+    };
+
+    let timer;
+    let select_id;
+    let select_value;
+    let item_id = {{ id }};
+    let user_id = {{ user.id }}
+
+    function initialize() {
+      let search_box = document.getElementById("search_box");
+      search_box.addEventListener("keyup", () => {
+      delay_search(search_box.value, 100);
+      });
+
+      axios.get("/api/item/", {params:{id: item_id}}).then((response) => {
+        select_id = response.data[0].supplier_id.id
+        select_value = response.data[0].supplier_id.name
+
+        axios.get("/api/supplier/").then(function (response1) {
+              let data = response1.data;
+              data.forEach((supplier) => {
+                  option = document.createElement('option')
+                  option.innerText = supplier.name
+                  option.value = supplier.id
+                  if (response.data[0].id === supplier.id) {
+                      option.setAttribute('selected', true)
+                  }
+                  document.getElementById('dropdown_item').append(option)
+              })
+          });
+
+
+        document.getElementById('name').value = response.data[0].name
+        document.getElementById('description').value = response.data[0].description
+        document.getElementById('item_type').value = response.data[0].item_type
+        document.getElementById('purchase_price').value = response.data[0].purchase_price
+        document.getElementById('sale_price').value = response.data[0].sale_price
+      });
+    }
+
+    function save() {
+      document.getElementById('error_name').innerText = ""
+      document.getElementById('error_description').innerText = ""
+      document.getElementById('error_item_type').innerText = ""
+      document.getElementById('error_purchase_price').innerText = ""
+      document.getElementById('error_sale_price').innerText = ""
+
+      axios.put("/api/item/", {
+        id: item_id,
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        item_type: document.getElementById('item_type').value,
+        purchase_price: document.getElementById('purchase_price').value,
+        sale_price: document.getElementById('sale_price').value,
+        supplier_id: document.getElementById('dropdown_item').value,
+      }).then((response) => {
+        window.location.href = "/manage/item/";
+      }).catch((error) => {
+        if (error.response.data.name){
+          document.getElementById('error_name').innerText = error.response.data.name[0]
+        }
+        if (error.response.data.description){
+          document.getElementById('error_description').innerText = error.response.data.description[0]
+        }
+        if (error.response.data.item_type){
+          document.getElementById('error_item_type').innerText = error.response.data.item_type[0]
+        }
+        if (error.response.data.purchase_price){
+          document.getElementById('error_purchase_price').innerText = error.response.data.purchase_price[0]
+        }
+        if (error.response.data.sale_price){
+          document.getElementById('error_sale_price').innerText = error.response.data.sale_price[0]
+        }
+      })
+    }
+
+    function delete_data() {
+      axios.delete("/api/item/", { data: { id: item_id } }).then((response) => {
+        window.location.href = "/manage/item/";
+      })
+    }
+
+  function item_list() {
+    let dropdown_item = document.getElementById("id_item_id");
+    if (total_item != 1)
+      dropdown_item.innerHTML = ""
+
+    for (let i = 0; i < total_item; i++) {
+      if (data[i]) {
+        let items = data[i];
+        let item = document.createElement("option");
+        item.innerText = items.name;
+        item.value = items.id;
+        dropdown_item.append(item);
+      }
+    }
+  }
+
+  function search(value) {
+    axios
+      .get("/api/supplier/", {
+        params: {
+          search: value,
+        },
+      })
+      .then(function (response) {
+        document.getElementById('dropdown_item').innerHTML = `<option value='${select_id}' selected>${select_value}</option>`
+        let data = response.data;
+              data.forEach((item) => {
+                  option = document.createElement('option')
+                  option.innerText = item.name
+                  option.value = item.id
+                  // if (response.data[0].item_id.id === item.id) {
+                  //     option.setAttribute('selected', true)
+                  // }
+                  document.getElementById('dropdown_item').append(option)
+              })
+      });
+  }
+
+
+  function delay_search(value, ms) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      search(value);
+    }, ms);
+  }
+</script>
+{% endblock content %}

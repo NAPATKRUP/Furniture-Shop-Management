@@ -1,0 +1,103 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<form method="POST" class="w-100" action="{% url 'start' %}">
+  {% csrf_token %}
+  <h1 class="my-4 text-dark text-center">สวัสดี เจ้าของร้านคนใหม่!</h1>
+  <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+      <div class="form-group text-dark">
+        <label for="fname">ชื่อจริง *</label>
+        <input
+          type="text"
+          class="form-control w-100 border rounded bg-light"
+          value="{{fname}}"
+          name="fname"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="lname">นามสกุล *</label>
+        <input
+          type="text"
+          class="form-control w-100 border rounded bg-light"
+          value="{{lname}}"
+          name="lname"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="email">อีเมล *</label>
+        <input
+          type="email"
+          class="form-control w-100 border rounded bg-light"
+          value="{{email}}"
+          name="email"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="username">บัญชีผู้ใช้ *</label>
+        <input
+          type="text"
+          class="form-control w-100 border rounded bg-light"
+          value="{{username}}"
+          name="username"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="password">รหัสผ่าน *</label>
+        <input
+          type="password"
+          class="form-control w-100 border rounded bg-light"
+          value="{{password}}"
+          name="password"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="password2">ยืนยันรหัสผ่าน *</label>
+        <input
+          type="password"
+          class="form-control w-100 border rounded bg-light"
+          value="{{password2}}"
+          name="password2"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="phone">เบอร์โทรศัพท์ *</label>
+        <input
+          type="phone"
+          class="form-control w-100 border rounded bg-light"
+          value="{{phone}}"
+          name="phone"
+          maxlength="10"
+          required
+        />
+      </div>
+
+      <div class="form-group text-dark">
+        <label for="shop_name">ชื่อร้านค้า *</label>
+        <input
+          type="text"
+          class="form-control w-100 border rounded bg-light"
+          value="{{shop_name}}"
+          name="shop_name"
+          required
+        />
+      </div>
+      {% if error %}
+      <p class="text-error">{{error}}</p>
+      {% endif %}
+      <input type="submit" value="ตกลง" class="btn btn-orange w-100 my-3" />
+    </div>
+  </div>
+</form>
+{% endblock %}

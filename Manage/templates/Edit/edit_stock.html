@@ -1,0 +1,221 @@
+{% extends "base.html" %} {% block content %}
+<h5 class="mt-4"><i class="fas fa-edit"></i> แก้ไขข้อมูลสต็อก</h5>
+<hr class="my-3 hr-orange" />
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="" class="mt-2">ชื่อสินค้า:</label>
+  <div class="form-group text-white">
+    <div class="input-group mb-2 mr-sm-2">
+      <div class="input-group-prepend">
+        <div class="input-group-text">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+      <input
+        id="search_box"
+        type="text"
+        class="form-control w-25"
+        placeholder="ค้นหา"
+      />
+      <select name="" id="dropdown_item" class="form-control ml-3" required>
+      </select>
+    </div>
+  </div>
+  <p class="text-error" id="error_item_id"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="color">สี:</label>
+  <input type="text" id="color" class="form-control mt-0 mb-2" />
+  <p class="text-error" id="error_color"></p>
+</div>
+<div class="form-group text-dark col-8 mx-auto mt-3">
+  <label for="amount">จำนวน:</label>
+  <input type="text" id="amount" class="form-control mt-0 mb-2" />
+  <p class="text-error" id="error_amount"></p>
+</div>
+
+<div class="text-center">
+  <button
+    onclick=""
+    class="btn btn-success"
+    data-toggle="modal"
+    data-target="#modal1"
+  >
+    บันทึกข้อมูล
+  </button>
+  <button class="btn btn-danger" data-toggle="modal" data-target="#modal2">
+    ลบข้อมูล
+  </button>
+</div>
+
+<!-- modal1 -->
+<div class="modal fade" id="modal1" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการบันทึกข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button onclick="save()" class="btn btn-success" data-dismiss="modal">
+            บันทึก
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal2 -->
+<div class="modal fade" id="modal2" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 calss="ml-2">
+          <i class="fas fa-exclamation-triangle"></i> คำเตือน !
+        </h5>
+      </div>
+      <div class="modal-body text-center">
+        <h5>คุณต้องการลบข้อมูลใช่หรือไม่?</h5>
+      </div>
+      <div>
+        <div class="modal-footer mt-3">
+          <button
+            onclick="delete_data()"
+            class="btn btn-success"
+            data-dismiss="modal"
+          >
+            ลบ
+          </button>
+          <button onclick="" class="btn btn-danger" data-dismiss="modal">
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    window.onload = function () {
+      initialize();
+    };
+
+    let timer;
+    let select_id;
+    let select_value;
+    let stock_id = {{ id }};
+    let user_id = {{ user.id }}
+
+    function initialize() {
+      let search_box = document.getElementById("search_box");
+      search_box.addEventListener("keyup", () => {
+      delay_search(search_box.value, 100);
+      });
+
+      axios.get("/api/stock/", {params:{id: stock_id}}).then((response) => {
+        select_id = response.data[0].item_id.id
+        select_value = response.data[0].item_id.name
+          axios.get("/api/item/").then(function (response1) {
+              let data = response1.data;
+              data.forEach((item) => {
+                  option = document.createElement('option')
+                  option.innerText = item.name
+                  option.value = item.id
+                  if (response.data[0].item_id.id === item.id) {
+                      option.setAttribute('selected', true)
+                  }
+                  document.getElementById('dropdown_item').append(option)
+              })
+          });
+
+        document.getElementById('color').value = response.data[0].color
+        document.getElementById('amount').value = response.data[0].amount
+      });
+    }
+
+    function save() {
+      document.getElementById('error_item_id').innerText = ""
+      document.getElementById('error_color').innerText = ""
+      document.getElementById('error_amount').innerText = ""
+
+      axios.put("/api/stock/", {
+        id: stock_id,
+        item_id: document.getElementById('dropdown_item').value,
+        color: document.getElementById('color').value,
+        amount: document.getElementById('amount').value,
+      }).then((response) => {
+        window.location.href = "/manage/stock/";
+      }).catch((error) => {
+        if (error.response.data.item_id){
+          document.getElementById('error_item_id').innerText = error.response.data.item_id[0]
+        }
+        if (error.response.data.color){
+          document.getElementById('error_color').innerText = error.response.data.color[0]
+        }
+        if (error.response.data.amount){
+          document.getElementById('error_amount').innerText = error.response.data.amount[0]
+        }
+      })
+    }
+
+    function delete_data() {
+      axios.delete("/api/stock/", { data: { id: stock_id } }).then((response) => {
+        window.location.href = "/manage/stock/";
+      })
+    }
+
+  function item_list() {
+    let dropdown_item = document.getElementById("id_item_id");
+    if (total_item != 1)
+      dropdown_item.innerHTML = ""
+
+    for (let i = 0; i < total_item; i++) {
+      if (data[i]) {
+        let items = data[i];
+        let item = document.createElement("option");
+        item.innerText = items.name;
+        item.value = items.id;
+        dropdown_item.append(item);
+      }
+    }
+  }
+
+  function search(value) {
+    axios
+      .get("/api/item/", {
+        params: {
+          search: value,
+        },
+      })
+      .then(function (response) {
+        document.getElementById('dropdown_item').innerHTML = `<option value='${select_id}' selected>${select_value}</option>`
+        let data = response.data;
+              data.forEach((item) => {
+                  option = document.createElement('option')
+                  option.innerText = item.name
+                  option.value = item.id
+                  // if (response.data[0].item_id.id === item.id) {
+                  //     option.setAttribute('selected', true)
+                  // }
+                  document.getElementById('dropdown_item').append(option)
+              })
+      });
+  }
+
+
+  function delay_search(value, ms) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      search(value);
+    }, ms);
+  }
+</script>
+{% endblock content %}

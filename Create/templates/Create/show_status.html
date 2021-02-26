@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block content %}
+<div class="mt-4 d-flex">
+  <h5 class="align-self-end">
+    <i class="fas fa-user-friends"></i> มีข้อผิดพลาดระหว่างการสั่งซื้อ
+  </h5>
+</div>
+<hr class="mt-2 mb-3 hr-orange" />
+<div class="text-center">
+  {% for i in error %}
+    <p class="text-error m-4">{{ i }}</p>
+  {% endfor %}
+  <a href="{% url 'index' %}" class="btn btn-orange p-3 m-2">กลับไปหน้าหลัก</a>
+  <a href="{% url 'view_order' order_id %}" class="btn btn-orange p-3 m-2">ดูรายละเอียดคำสั่งซื้อ</a>
+</div>
+{% endblock content %}
