@@ -1,5 +1,6 @@
 # Furniture Shop Management
 This repository consists of codes of "Web programming (WebPro)" Project, Faculty of Information Technology, King Mongkut's Institute of Technology Ladkrabang (KMITL).
+#### Main Git Repo: https://github.com/max180643/Furniture-Shop-Management
 ______
 # Preview
 ### • Login
